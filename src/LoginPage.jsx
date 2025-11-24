@@ -1,6 +1,7 @@
 import { useFormik  } from "formik"
 import { Link } from "react-router-dom";
 import { IoCartOutline } from "react-icons/io5";
+import * as Yup from "yup";
 import "./LoginPage.jsx"
 
 function LoginPage() {
@@ -9,25 +10,38 @@ function LoginPage() {
     console.log("sending data",values.username,values.password);
   }
 
-  const { handleSubmit, values, handleChange, resetForm } = useFormik({
+  const schema = Yup.object().shape({
+    username:Yup.string().required(),
+    password:Yup.string().min(8).max(12).required()
+  })
+
+  const { handleSubmit, values, handleChange, resetForm, errors, handleBlur, touched } = useFormik({
     initialValues: {
       username: "",
       password: "",
     },
     onSubmit: callLoginApi,
-  })
+    validationSchema:schema
+  });
 
   return (
-    <div className="h-screen  flex flex-col  justify-center items-center bg-blue-700 ">
+    <div className="h-screen  flex flex-col  justify-center items-center bg-blue-600 ">
     <div> <IoCartOutline className=" text-9xl"/></div>
     <form  onSubmit={handleSubmit} className="space-y-4" >
     <div>
       <label htmlFor="name" className="sr-only">Username</label>
-      <input required value={values.username} onChange={handleChange} name="username" type="text" placeholder="USERNAME" className="border-2 p-2 text-center text-2xl border-white  text-gray-200 rounded-xl" id="name"/>
+      <input required value={values.username} onBlur={handleBlur} onChange={handleChange} name="username" type="text" placeholder="USERNAME" className="border-2 p-2 text-center text-2xl border-white  text-gray-200 rounded-xl" id="name"/>
+      { touched.username  && errors.username && (
+        <div className="text-red-700">{errors.username}</div>
+      )}
     </div>
     <div>
       <label htmlFor="user-password" className="sr-only">Password</label>
-      <input required value={values.password} onChange={handleChange} name="password" type="password" placeholder="PASSWORD" className="border-2 p-2 text-center text-2xl border-white text-gray-200 rounded-xl" id="user-password"/>
+      <input required value={values.password} onBlur={handleBlur}  onChange={handleChange} name="password" type="password" placeholder="PASSWORD" className="border-2 p-2 text-center text-2xl border-white text-gray-200 rounded-xl" id="user-password"/>
+      { touched.password && errors.password && (
+        <div className="text-red-700">{errors.password}</div>
+      )}
+      
     </div>
     <div className="flex flex-col space-y-2 mb-11" >
       <button type="submit" className="border-2 p-2 text-center text-xl w-75  bg-white text-blue-500">LOGIN</button>
